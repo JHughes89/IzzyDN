@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#161116" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Date Night" />
+  <title>Date Night ❤️</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <style>
+    :root { color-scheme: dark; --bg:#120f13; --card:#1c171e; --soft:#2a222c; --text:#fff8fb; --muted:#cdbfca; --accent:#ff7aa8; --accent2:#ffb3cc; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family: ui-rounded, -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Segoe UI", sans-serif; background: radial-gradient(circle at top, #2a1823 0, var(--bg) 45%); color:var(--text); }
+    .wrap { width:min(680px,100%); margin:0 auto; padding: max(24px, env(safe-area-inset-top)) 18px max(32px, env(safe-area-inset-bottom)); }
+    .hero { padding:24px 8px 18px; text-align:center; }
+    .heart { font-size:44px; line-height:1; }
+    h1 { margin:10px 0 8px; font-size:clamp(34px,10vw,52px); letter-spacing:-1.8px; }
+    .sub { margin:0 auto; max-width:520px; color:var(--muted); font-size:16px; line-height:1.45; }
+    .card { background:rgba(28,23,30,.94); border:1px solid rgba(255,255,255,.08); border-radius:24px; padding:18px; box-shadow:0 18px 50px rgba(0,0,0,.25); backdrop-filter: blur(12px); }
+    .grid { display:grid; gap:14px; grid-template-columns:1fr 1fr; }
+    .full { grid-column:1/-1; }
+    label { display:block; font-size:13px; font-weight:700; color:var(--accent2); margin:0 0 7px 2px; }
+    input, select { width:100%; min-height:52px; border:1px solid rgba(255,255,255,.09); border-radius:16px; background:var(--soft); color:var(--text); padding:0 14px; font:inherit; font-size:16px; outline:none; }
+    input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,122,168,.13); }
+    .actions { display:grid; gap:12px; margin-top:18px; }
+    button { min-height:56px; border:0; border-radius:18px; font:inherit; font-size:17px; font-weight:800; cursor:pointer; }
+    .primary { background:linear-gradient(135deg,var(--accent),#ff9fbe); color:#2a0e19; }
+    .secondary { background:#fff; color:#1a1318; }
+    .preview { margin-top:16px; padding:16px; border-radius:18px; background:#151116; border:1px solid rgba(255,255,255,.06); color:var(--muted); line-height:1.5; white-space:pre-wrap; }
+    .tiny { margin:14px 4px 0; color:#998e97; text-align:center; font-size:12px; line-height:1.4; }
+    @media (max-width:520px){ .grid{grid-template-columns:1fr;} .full{grid-column:auto;} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="heart">❤️</div>
+      <h1>Date Night</h1>
+      <p class="sub">Pick the plan, then send it straight by email or text.</p>
+    </section>
+
+    <section class="card">
+      <div class="grid">
+        <div>
+          <label for="date">Date</label>
+          <input id="date" type="date" required />
+        </div>
+        <div>
+          <label for="time">Time</label>
+          <input id="time" type="time" value="19:30" required />
+        </div>
+        <div class="full">
+          <label for="dress">Dress code</label>
+          <select id="dress">
+            <option>Casual</option>
+            <option selected>Smart Casual</option>
+            <option>Dressy</option>
+            <option>Fancy</option>
+          </select>
+        </div>
+        <div>
+          <label for="food">Food</label>
+          <select id="food">
+            <option>Steak</option>
+            <option>Italian</option>
+            <option>Sushi</option>
+            <option>Tapas</option>
+            <option>Indian</option>
+            <option>Thai</option>
+            <option>Mexican</option>
+            <option>Surprise me</option>
+          </select>
+        </div>
+        <div>
+          <label for="restaurant">Restaurant</label>
+          <input id="restaurant" type="text" placeholder="e.g. Cowshed Liverpool" />
+        </div>
+      </div>
+
+      <div class="preview" id="preview"></div>
+
+      <div class="actions">
+        <button class="primary" id="emailBtn">✉️ Email the plan</button>
+        <button class="secondary" id="smsBtn">💬 Text the plan</button>
+      </div>
+      <p class="tiny">For privacy and spam protection, a static GitHub Pages site can’t silently send messages by itself. These buttons open a ready-filled email or text on the phone; just press Send.</p>
+    </section>
+  </main>
+
+<script>
+  const EMAIL = 'JHughes89.yt@gmail.com';
+  const PHONE = '07488711426';
+  const dateEl = document.querySelector('#date');
+  const timeEl = document.querySelector('#time');
+  const dressEl = document.querySelector('#dress');
+  const foodEl = document.querySelector('#food');
+  const restaurantEl = document.querySelector('#restaurant');
+  const previewEl = document.querySelector('#preview');
+
+  const today = new Date();
+  const localISO = new Date(today.getTime() - today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  dateEl.min = localISO;
+  dateEl.value = localISO;
+
+  function prettyDate(value){
+    if(!value) return 'No date selected';
+    const [y,m,d] = value.split('-').map(Number);
+    return new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(y,m-1,d));
+  }
+
+  function buildMessage(){
+    const restaurant = restaurantEl.value.trim() || 'Not chosen yet';
+    return `❤️ DATE NIGHT\n\n📅 ${prettyDate(dateEl.value)}\n🕒 ${timeEl.value || 'Time TBC'}\n👕 ${dressEl.value}\n🍽️ ${foodEl.value}\n📍 ${restaurant}\n\nFancy it? ❤️`;
+  }
+
+  function refresh(){ previewEl.textContent = buildMessage(); }
+  [dateEl,timeEl,dressEl,foodEl,restaurantEl].forEach(el=>el.addEventListener('input',refresh));
+  refresh();
+
+  document.querySelector('#emailBtn').addEventListener('click',()=>{
+    const subject = encodeURIComponent(`Date Night — ${prettyDate(dateEl.value)}`);
+    const body = encodeURIComponent(buildMessage());
+    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+  });
+
+  document.querySelector('#smsBtn').addEventListener('click',()=>{
+    const body = encodeURIComponent(buildMessage());
+    // iOS commonly accepts &body= while Android often accepts ?body=. Using ?& fallback-friendly form.
+    window.location.href = `sms:${PHONE}?&body=${body}`;
+  });
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
